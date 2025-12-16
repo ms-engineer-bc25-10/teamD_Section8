@@ -1,34 +1,26 @@
 @import "tailwindcss";
 
 /* =========================
-   Theme variables
-========================= */
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-/* =========================
-   Tailwind theme mapping
+   Design Tokens (Oshi Bank)
 ========================= */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  /* base */
+  --color-oshi-sky: #eaf6ff;
+  --color-oshi-cloud: #ffffff;
+
+  /* brand */
+  --color-oshi-main: #4a90e2;
+  --color-oshi-sub: #a0cfff;
+  --color-oshi-accent: #ffd6e8;
+
+  /* text */
+  --color-oshi-text: #1f2937; /* gray-800 */
 }
 
 /* =========================
    Base styles
 ========================= */
 body {
-  @apply bg-oshi-sky text-gray-800;
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-oshi-sky);
+  color: var(--color-oshi-text);
 }
