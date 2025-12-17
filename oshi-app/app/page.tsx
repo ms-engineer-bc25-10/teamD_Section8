@@ -68,8 +68,21 @@ import OshiHeader from "./components/OshiHeader";
 import BalanceCard from "./components/BalanceCard";
 import RewardButton from "./components/RewardButton";
 
-export default function Page() {
-  const balance = 950000; // MVP用の固定値
+async function getBalance() {
+  const res = await fetch("http://localhost:3000/api/balance", {
+    cache: "no-store", // 常に最新残高
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch balance");
+  }
+
+  const data: { balance: number } = await res.json();
+  return data.balance;
+}
+
+export default async function Page() {
+  const balance = await getBalance();
 
   return (
     <CloudBackground>
@@ -92,13 +105,11 @@ export default function Page() {
               rewardKey="call"
               amount={100}
             />
-
             <RewardButton
               label="静かに推しのことを想った+100円"
               rewardKey="think"
               amount={100}
             />
-
             <RewardButton
               label="推しの魅力を語った+100円"
               rewardKey="talk"
