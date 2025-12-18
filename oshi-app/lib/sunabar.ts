@@ -71,3 +71,39 @@ export async function transferSpAccount(params: {
     }),
   });
 }
+
+/**
+ * 入出金明細の型定義
+ */
+export interface Transaction {
+  transactionDate: string; // 処理日 (YYYY-MM-DD)
+  valueDate: string;       // 起算日
+  remarks: string;         // 摘要
+  amount: number;          // 取引金額
+  balance: number;         // 取引後残高
+}
+
+/**
+ * 親口座の入出金明細照会 (GET)
+ * SUNABAR_PARENT_ACCOUNT_ID を使用して明細を取得します
+ */
+export async function getParentTransactions() {
+  const accountId = process.env.SUNABAR_PARENT_ACCOUNT_ID;
+  
+  if (!accountId) {
+    throw new Error("SUNABAR_PARENT_ACCOUNT_ID が設定されていません");
+  }
+
+  // IDから数字以外（SPなど）を除去してリクエストに使用
+//   const cleanId = accountId.replace(/[^\d]/g, "");
+  
+  // クエリパラメータとして accountId を付与
+  const path = `/accounts/transactions?accountId=${accountId}`;
+
+  const data = await sunabarFetch<{
+    transactions: Transaction[];
+  }>(path);
+
+  // 明細の配列を返す
+  return data.transactions || [];
+}
