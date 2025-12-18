@@ -63,10 +63,12 @@
 //     </div>
 //   );
 // }
+import Link from "next/link";
 import CloudBackground from "./components/CloudBackground";
 import OshiHeader from "./components/OshiHeader";
 import BalanceCard from "./components/BalanceCard";
 import RewardButton from "./components/RewardButton";
+import SacrificeButton from "./components/SacrificeButton";
 
 async function getBalance() {
   const res = await fetch("http://localhost:3000/api/balance", {
@@ -86,12 +88,14 @@ export default async function Page() {
 
   return (
     <CloudBackground>
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-2">
         {/* ヘッダー */}
         <OshiHeader />
 
         {/* 残高 */}
+        <Link href="/history" className="block transition-transform active:scale-95">
         <BalanceCard balance={balance} />
+        </Link>
 
         {/* 今日の推し活 */}
         <div>
@@ -99,7 +103,7 @@ export default async function Page() {
             今日の推し活
           </p>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-1">
             <RewardButton
               label="コールをちゃんとした+100円"
               rewardKey="call"
@@ -117,7 +121,10 @@ export default async function Page() {
             />
           </div>
         </div>
+      <SacrificeButton /> 
       </div>
     </CloudBackground>
   );
 }
+
+

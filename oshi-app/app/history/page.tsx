@@ -5,42 +5,115 @@ import Link from "next/link";
 import CloudBackground from "../components/CloudBackground";
 
 export default function HistoryPage() {
-  const [history, setHistory] = useState([]);
+  const [history, setHistory] = useState<any[]>([]);
 
   useEffect(() => {
     fetch("/api/history")
       .then((res) => res.json())
-      .then((data) => setHistory(data.transactions || []));
+      .then((data) => {
+        const transactions = data.transactions || [];
+        
+        // 💡 ロジック：送金の「直前」にある同額の振替を消す
+        const filtered: any[] = [];
+        
+        for (let i = 0; i < transactions.length; i++) {
+          const current = transactions[i];
+          const next = transactions[i + 1];
+
+          // 判定：
+          // 1. 現在の行が「振替」による入金である
+          // 2. 次の行が存在し、かつ「スナバ」または「振込」名義の出金である
+          // 3. その2つの金額（絶対値）が完全に一致する
+          const isInternalTransfer = 
+            current.remarks?.includes("振替") && 
+            current.amount > 0 &&
+            next && 
+            (next.remarks?.includes("スナバ") || next.remarks?.includes("振込")) &&
+            Math.abs(current.amount) === Math.abs(next.amount);
+
+          if (isInternalTransfer) {
+            // 直前の振替なので、filteredに追加せずスキップ（＝非表示）
+            console.log(`🚫 送金直前の振替を非表示にしました: ${current.amount}円`);
+            continue; 
+          }
+
+          filtered.push(current);
+        }
+
+        // 最新順に並び替えてセット
+        setHistory([...filtered].reverse());
+      });
   }, []);
 
   return (
     <CloudBackground>
-      <div className="max-w-md mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-xl font-bold text-oshi-main">入出金明細</h1>
-          <Link href="/" className="text-xs text-gray-500 bg-white/50 px-3 py-1 rounded-full shadow-sm">
+      <div className="max-w-md mx-auto px-2">
+        <div className="flex justify-between items-end mb-4 px-1">
+          <div>
+            <h1 className="text-xl font-black text-oshi-main tracking-tighter">
+              推しへの想いの軌跡
+            </h1>
+            <p className="text-[10px] text-oshi-main/60 font-bold uppercase">
+              My Devotion History
+            </p>
+          </div>
+          <Link 
+            href="/" 
+            className="text-[10px] text-gray-500 bg-white/70 px-4 py-1.5 rounded-full shadow-sm hover:bg-white transition-all active:scale-95"
+          >
             戻る
           </Link>
         </div>
 
-        <div className="bg-white/80 rounded-cloud p-4 shadow-soft">
+        <div className="bg-white/90 rounded-[2.5rem] p-6 shadow-xl border border-white min-h-[450px]">
           {history.length === 0 ? (
-            <p className="text-center text-gray-400 py-10 text-sm">明細がありません</p>
+            <div className="flex flex-col items-center py-20">
+              <span className="text-4xl mb-4">✨</span>
+              <p className="text-center text-gray-400 text-sm italic">
+                まだ想いの軌跡がありません。
+              </p>
+            </div>
           ) : (
-            <div className="flex flex-col gap-4">
-              {history.map((item: any, i) => (
-                <div key={i} className="flex justify-between items-center border-b border-gray-100 pb-2 last:border-0">
-                  <div className="text-left">
-                    <p className="text-[10px] text-gray-400">{item.transactionDate}</p>
-                    <p className="text-sm font-semibold text-oshi-text">{item.remarks}</p>
+            <div className="flex flex-col gap-6">
+              {history.map((item: any, i) => {
+                const absAmt = Math.abs(item.amount);
+                const isSentToOshi = item.amount < 0 || item.remarks?.includes("スナバ") || item.remarks?.includes("振込");
+
+                return (
+                  <div key={i} className="flex justify-between items-center border-b border-pink-50 pb-4 last:border-0 last:pb-0">
+                    <div className="text-left">
+                      <p className="text-[9px] text-gray-400 font-bold mb-0.5">{item.transactionDate}</p>
+                      <p className={`text-sm font-bold leading-tight ${isSentToOshi ? "text-pink-600" : "text-oshi-text"}`}>
+                        {isSentToOshi 
+                          ? `${absAmt.toLocaleString()}円を推しに届けた💕` 
+                          : item.remarks || "推しへの想い"}
+                      </p>
+                    </div>
+                    
+                    <div className="text-right">
+                      <p className={`text-base font-black ${isSentToOshi ? "text-pink-500" : "text-oshi-main"}`}>
+                        {isSentToOshi ? "" : "+"}{absAmt.toLocaleString()}円
+                      </p>
+                      {isSentToOshi && (
+                        <div className="flex items-center justify-end gap-0.5 -mt-1">
+                          <span className="text-[8px] text-pink-300 font-black uppercase tracking-tighter">
+                            Love Delivered
+                          </span>
+                          <span className="text-[10px]">✨</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <p className={`font-bold ${item.amount < 0 ? "text-red-400" : "text-oshi-main"}`}>
-                    {item.amount > 0 ? "+" : ""}{item.amount.toLocaleString()}円
-                  </p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
+        </div>
+        
+        <div className="h-12 flex items-center justify-center">
+          <p className="text-[9px] text-oshi-main/30 font-bold tracking-widest uppercase text-center">
+            Presented by OshiPay Finance
+          </p>
         </div>
       </div>
     </CloudBackground>
