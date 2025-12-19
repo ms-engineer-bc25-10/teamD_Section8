@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+// import Link from "next/link";
 
 type BalanceCardProps = {
   balance: number; // 例: 950000
@@ -8,7 +8,7 @@ type BalanceCardProps = {
 
 export default function BalanceCard({ balance }: BalanceCardProps) {
   return (
-    <Link href="/history" className="block cursor-pointer transition-transform active:scale-95">
+    // <Link href="/history" className="block cursor-pointer transition-transform active:scale-95">
     <div className="w-full rounded-cloud bg-white/80 shadow-soft px-6 py-5 text-center backdrop-blur">
       {/* ラベル */}
       <p className="mb-2 text-sm font-semibold text-oshi-main">
@@ -23,6 +23,6 @@ export default function BalanceCard({ balance }: BalanceCardProps) {
       {/* 補足 */}
       <p className="mt-1 text-xs text-gray-500">sunabar（銀行API実験場）</p>
     </div>
-    </Link>
+    // </Link>
   );
 }
