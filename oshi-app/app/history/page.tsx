@@ -13,7 +13,7 @@ export default function HistoryPage() {
       .then((data) => {
         const transactions = data.transactions || [];
         
-        // 💡 ロジック：送金の「直前」にある同額の振替を消す
+        // 💡 ロジック：送金の「直前」にある同額の振替（内部移動）を非表示にする
         const filtered: any[] = [];
         
         for (let i = 0; i < transactions.length; i++) {
@@ -32,8 +32,7 @@ export default function HistoryPage() {
             Math.abs(current.amount) === Math.abs(next.amount);
 
           if (isInternalTransfer) {
-            // 直前の振替なので、filteredに追加せずスキップ（＝非表示）
-            console.log(`🚫 送金直前の振替を非表示にしました: ${current.amount}円`);
+            console.log(`🚫 送金直前の内部振替を非表示にしました: ${current.amount}円`);
             continue; 
           }
 
@@ -77,7 +76,13 @@ export default function HistoryPage() {
             <div className="flex flex-col gap-6">
               {history.map((item: any, i) => {
                 const absAmt = Math.abs(item.amount);
-                const isSentToOshi = item.amount < 0 || item.remarks?.includes("スナバ") || item.remarks?.includes("振込");
+
+                // 💡 修正ポイント：
+                // 「金額がマイナス（出金）」かつ「送金関連のキーワードがある」場合のみピンクにする
+                // これにより、プラスの「振替（課金）」は水色のままになります
+                const isSentToOshi = 
+                  item.amount < 0 && 
+                  (item.remarks?.includes("スナバ") || item.remarks?.includes("振込"));
 
                 return (
                   <div key={i} className="flex justify-between items-center border-b border-pink-50 pb-4 last:border-0 last:pb-0">
@@ -92,6 +97,7 @@ export default function HistoryPage() {
                     
                     <div className="text-right">
                       <p className={`text-base font-black ${isSentToOshi ? "text-pink-500" : "text-oshi-main"}`}>
+                        {/* 届いた時（ピンク）は＋を表示しない、課金（水色）は＋を表示 */}
                         {isSentToOshi ? "" : "+"}{absAmt.toLocaleString()}円
                       </p>
                       {isSentToOshi && (
