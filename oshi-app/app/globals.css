@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+/* =========================
+   Design Tokens (Oshi Bank)
+========================= */
+@theme inline {
+  /* base */
+  --color-oshi-sky: #eaf6ff;
+  --color-oshi-cloud: #ffffff;
+
+  /* brand */
+  --color-oshi-main: #4a90e2;
+  --color-oshi-sub: #a0cfff;
+  --color-oshi-accent: #ffd6e8;
+
+  /* text */
+  --color-oshi-text: #1f2937; /* gray-800 */
+}
+
+/* =========================
+   Base styles
+========================= */
+body {
+  background-color: var(--color-oshi-sky);
+  color: var(--color-oshi-text);
+}
