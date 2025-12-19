@@ -5,13 +5,18 @@ export const dynamic = "force-dynamic"; // キャッシュを無効化して常�
 
 export async function GET() {
   try {
-    // lib/sunabar.ts の関数を呼び出し
-    const transactions = await getParentTransactions();
+    // 親口座の全明細を取得する
+    const allTransactions = await getParentTransactions();
 
-    // 成功時：明細データをJSONで返す
+    // 「任意の口座名」という言葉だけが含まれる明細にフィルタリングする
+    const oshiOnly = allTransactions.filter((item: any) =>
+      item.remarks.includes("推しへの想い")
+    );
+
+    // 成功時：絞り込んだ明細データをJSONで返す
     return NextResponse.json({
       success: true,
-      transactions: transactions,
+      transactions: oshiOnly,
     });
   } catch (error) {
     console.error("History Route Error:", error);
