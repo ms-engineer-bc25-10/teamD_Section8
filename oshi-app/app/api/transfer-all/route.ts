@@ -3,12 +3,12 @@ import { executeDevilTransfer } from "@/lib/oshi-transfer";
 
 export async function POST() {
   try {
-    // 固定の口座IDを渡して実行（0仕込みロジックは executeDevilTransfer 内で処理）
-    // チームの流儀に合わせて、ここで ID を指定します
     const result = await executeDevilTransfer({
-      oshiAccountId: "SP50220961561",   // あなたが特定した子口座
-      parentAccountId: "302010011594"   // あなたが特定した親口座
+      oshiAccountId: process.env.SUNABAR_OSHIKATSU_ACCOUNT_ID!,
+      parentAccountId: process.env.SUNABAR_PARENT_ACCOUNT!,
     });
+    console.log("oshi:", process.env.SUNABAR_OSHIKATSU_ACCOUNT_ID);
+    console.log("parent:", process.env.SUNABAR_PARENT_ACCOUNT);
 
     return NextResponse.json({ success: true, result });
   } catch (error: any) {
